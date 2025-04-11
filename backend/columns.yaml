@@ -1,0 +1,24 @@
+weight:
+  sheet_column: B
+  column_type: number
+run:
+  sheet_column: C
+  column_type: boolean
+strength:
+  sheet_column: D
+  column_type: boolean
+snacks:
+  sheet_column: E
+  column_type: boolean
+tv:
+  sheet_column: F
+  column_type: boolean
+read:
+  sheet_column: G
+  column_type: boolean
+sibari:
+  sheet_column: H
+  column_type: boolean
+meditate:
+  sheet_column: I
+  column_type: boolean
