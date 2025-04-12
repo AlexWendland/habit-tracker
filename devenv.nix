@@ -1,6 +1,10 @@
 { pkgs, lib, config, inputs, ... }:
 
 {
+  packages = [ 
+    pkgs.ruff
+    pkgs.mypy
+  ];
   # https://devenv.sh/languages/
   languages.javascript = {
     enable = true;
