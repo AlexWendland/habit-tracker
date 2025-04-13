@@ -1,6 +1,6 @@
 import pytest
 import datetime
-from storage.google_sheet import _get_date_index
+from habit_tracker.storage.google_sheet import _get_date_index
 
 
 @pytest.mark.parametrize(

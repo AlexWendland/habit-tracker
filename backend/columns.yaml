@@ -1,24 +1,32 @@
 weight:
-  sheet_column: B
+  column_reference: B
   column_type: number
+  display_name: Weight
 run:
-  sheet_column: C
+  column_reference: C
   column_type: boolean
+  display_name: Run
 strength:
-  sheet_column: D
+  column_reference: D
   column_type: boolean
+  display_name: Strength
 snacks:
-  sheet_column: E
+  column_reference: E
   column_type: boolean
+  display_name: No snacks
 tv:
-  sheet_column: F
+  column_reference: F
   column_type: boolean
+  display_name: <1hr TV
 read:
-  sheet_column: G
+  column_reference: G
   column_type: boolean
+  display_name: Read
 sibari:
-  sheet_column: H
+  column_reference: H
   column_type: boolean
+  display_name: Sibari
 meditate:
-  sheet_column: I
+  column_reference: I
   column_type: boolean
+  display_name: Meditate

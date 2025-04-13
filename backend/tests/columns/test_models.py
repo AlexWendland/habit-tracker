@@ -1,6 +1,6 @@
 import pytest
 from pydantic import ValidationError
-from your_module import ColumnDetails, ColumnType  # replace with actual import
+from habit_tracker.columns.models import ColumnDetails, ColumnType, HabitValue  # replace with actual import
 
 
 @pytest.mark.parametrize(
@@ -23,26 +23,21 @@ from your_module import ColumnDetails, ColumnType  # replace with actual import
     ],
     ids=["Without column reference", "With column reference"],
 )
-def test_from_yaml_valid(yaml_input, key, expected):
-    result = ColumnDetails.from_yaml(yaml_input, key)
-    assert result == expected
+def test_from_yaml_valid(yaml_input: dict[str, str], key:str, expected: ColumnDetails):
+    assert ColumnDetails.from_yaml(yaml_input, key) == expected
 
 
 @pytest.mark.parametrize(
     "yaml_input",
     [
-        {"column_type": "number", "display_name": "Sleep Hours"},  # Missing key
-        {"key": "sleep", "display_name": "Sleep Hours"},  # Missing column_type
-        {"key": "sleep", "column_type": "number"},  # Missing display_name
+        {"display_name": "Sleep Hours"},
+        {"column_type": "number"},
     ],
+    ids = ["Missing column_type", "Missing display_name"],
 )
-def test_from_yaml_missing_keys_raises(yaml_input):
+def test_from_yaml_missing_keys_raises(yaml_input: dict[str, str]):
     with pytest.raises(KeyError):
-        ColumnDetails.from_yaml(yaml_input, yaml_input.get("key", "dummy"))
-
-
-# --- Tests for check_value_type_matches ---
-
+        ColumnDetails.from_yaml(yaml_input, "dummy")
 
 @pytest.mark.parametrize(
     "column_type,value,expected",
@@ -55,6 +50,6 @@ def test_from_yaml_missing_keys_raises(yaml_input):
         (ColumnType.BOOLEAN, 1, False),
     ],
 )
-def test_check_value_type_matches(column_type, value, expected):
-    col = ColumnDetails(key="test", column_type=column_type, display_name="Test")
-    assert col.check_value_type_matches(value) is expected
+def test_check_value_type_matches(column_type: ColumnType, value: HabitValue, expected:bool):
+    mock_column = ColumnDetails(key="test", column_type=column_type, display_name="Test")
+    assert mock_column.check_value_type_matches(value) is expected

@@ -1,0 +1,11 @@
+test_number:
+  column_reference: N
+  column_type: number
+  display_name: Number
+test_boolean:
+  column_reference: B
+  column_type: boolean
+  display_name: Boolean
+test_no_reference:
+  column_type: number
+  display_name: No reference

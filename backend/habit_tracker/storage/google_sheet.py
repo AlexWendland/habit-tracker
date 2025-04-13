@@ -1,8 +1,9 @@
 import datetime
+from typing_extensions import override
 
 import gspread
 
-from habit_tracker.columns.models import ColumnType, HabitValue
+from habit_tracker.columns.models import ColumnDetails, ColumnType, HabitValue
 from habit_tracker.storage.base import StorageBase
 
 CREDENTIAL_FILE = "drive-credentials.json"
@@ -12,10 +13,11 @@ BASE_DATE = datetime.date(2025, 4, 2)
 
 class GoogleSheetStorage(StorageBase):
 
-    def __init__(self, habit_dictionary: dict[str, ColumnType], worksheet: gspread.Worksheet):
+    def __init__(self, habit_dictionary: dict[str, ColumnDetails], worksheet: gspread.Worksheet):
         self.habit_dictionary = habit_dictionary
         self._worksheet = worksheet
 
+    @override
     def _get_single_value_by_day(self, habit_key: str, day: datetime.date) -> HabitValue:
         """
         Get the value of the cell for the given column name and date.
@@ -23,27 +25,28 @@ class GoogleSheetStorage(StorageBase):
         When we call get we get back a cell range even if it is for a single cell. If this cell is blank cell.first()
         returns None.
         """
-        cell = self._worksheet.get(self._get_cell(habit_key, day))
-        column_type = self.habit_dictionary[habit_key].column_type
+        cell_value: str | None = self._worksheet.get(self._get_cell(habit_key, day)).first()
+        column_type = self._get_column_type(habit_key)
         if column_type == ColumnType.NUMBER:
-            return 0.0 if cell.first() is None else float(cell.first())
+            return self._get_default_value(habit_key) if cell_value is None else float(cell_value)
         elif column_type == ColumnType.BOOLEAN:
-            return False if cell.first() is None else cell.first().lower() == "true"
+            return self._get_default_value(habit_key) if cell_value is None else cell_value.first().lower() == "true"
         else:
             raise ValueError(f"Unknown column type: {column_details.column_type}")
 
+    @override
     def _set_single_value_by_day(self, habit_key: str, day: datetime.date, value: HabitValue) -> None:
         """
         Set the value of a habit for a specific day.
         """
         cell = self._worksheet.get(self._get_cell(habit_key, day))
-        column_type = self.habit_dictionary[habit_key].column_type
+        column_type = self._get_column_type(habit_key)
         if column_type == ColumnType.NUMBER:
             self._worksheet.update_acell(cell, float(value))
-        elif column_details.column_type == ColumnType.BOOLEAN:
+        elif column_type == ColumnType.BOOLEAN:
             self._worksheet.update_acell(cell, "TRUE" if value else "")
         else:
-            raise ValueError(f"Unknown column type: {column_details.column_type}")
+            raise ValueError(f"Unknown column type: {column_type}")
 
     def _get_cell(self, column_name: str, date: datetime.date) -> str:
         """

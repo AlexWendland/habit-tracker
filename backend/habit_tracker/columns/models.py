@@ -35,7 +35,7 @@ class ColumnDetails(pydantic.BaseModel):
         Checks a value matches the column type.
         """
         if self.column_type == ColumnType.NUMBER:
-            return isinstance(value, (int, float))
+            return isinstance(value, (int, float)) and not isinstance(value, bool)
         elif self.column_type == ColumnType.BOOLEAN:
             return isinstance(value, bool)
         else:
