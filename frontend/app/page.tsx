@@ -1,4 +1,4 @@
-import { HabitProvider } from "@/components/HabitProvider";
+import { HabitProvider } from "@/components/HabitContext";
 import { DashboardLayout } from "@/components/DashboardLayout";
 
 export default function Home() {

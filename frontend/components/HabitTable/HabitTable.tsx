@@ -1,13 +1,13 @@
 "use client";
 
-import { useHabitContext } from "@/components/HabitProvider";
+import { useHabitContext } from "@/components/HabitContext";
 import { HabitHeader } from "@/components/HabitTable/HabitHeader";
 import { HabitRow } from "@/components/HabitTable/HabitRow";
 
 export function HabitTable() {
   const { habits, entries } = useHabitContext();
-
-  const dates = Object.keys(entries[habits[0]?.id || ""] || {});
+  console.log("entries", entries);
+  const dates = Object.keys(entries[habits[0]?.key || ""] || {}).sort();
 
   return (
     <div className="overflow-x-auto border rounded-2xl shadow">
@@ -17,7 +17,7 @@ export function HabitTable() {
         </thead>
         <tbody>
           {habits.map(habit => (
-            <HabitRow key={habit.id} habit={habit} dates={dates} />
+            <HabitRow key={habit.key} habit={habit} dates={dates} />
           ))}
         </tbody>
       </table>

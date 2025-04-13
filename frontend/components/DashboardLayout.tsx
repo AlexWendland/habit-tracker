@@ -1,7 +1,7 @@
 "use client";
 
 import { HabitTable } from "@/components/HabitTable/HabitTable";
-import { useHabitContext } from "@/components/HabitProvider";
+import { useHabitContext } from "@/components/HabitContext";
 
 export function DashboardLayout() {
   const { habits, entries } = useHabitContext();
