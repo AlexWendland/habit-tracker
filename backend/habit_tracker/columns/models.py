@@ -4,13 +4,11 @@ from typing import Self
 import pydantic
 
 
-class ColumnType(enum.Enum):
-    NUMBER = enum.auto()
-    BOOLEAN = enum.auto()
-
+class ColumnType(enum.StrEnum):
+    NUMBER = "number"
+    BOOLEAN = "boolean"
 
 HabitValue = int | float | bool
-
 
 class ColumnDetails(pydantic.BaseModel):
     key: str
