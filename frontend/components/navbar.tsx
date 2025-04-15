@@ -16,11 +16,17 @@ import NextLink from "next/link";
 import clsx from "clsx";
 
 import { siteConfig } from "@/config/site";
-import { ThemeSwitch } from "@/components/theme-switch";
 
 export const Navbar = () => {
   return (
     <HeroUINavbar maxWidth="xl" position="sticky">
+      <NavbarContent
+        className="hidden sm:flex basis-1/5 sm:basis-full"
+        justify="end"
+      >
+        <NavbarItem className="hidden sm:flex gap-2">
+        </NavbarItem>
+      </NavbarContent>
     </HeroUINavbar>
   );
 };

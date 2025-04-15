@@ -9,7 +9,7 @@ type Props = {
 export function HabitRow({ habit, dates }: Props) {
   return (
     <tr>
-      <td className="px-4 py-2 font-semibold">{habit.name}</td>
+      <td className="py-4 font-semibold text-xl text-center">{habit.name}</td>
       {dates.map(date => (
         <HabitCell key={date} habitId={habit.key} habitType={habit.type} date={date} />
       ))}

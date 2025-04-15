@@ -10,7 +10,7 @@ import {
 } from "react";
 import { Habit, Entries } from "@/types/habit";
 import { fetchHabits, fetchHabitEntryBetween, setHabitEntry } from "@/lib/habitsApi";
-import { get14DayWindow } from "@/lib/dateUtils";
+import { getWindow } from "@/lib/dateUtils";
 
 type HabitContextType = {
   habits: Habit[];
@@ -55,7 +55,7 @@ export function HabitProvider({ children }: { children: ReactNode }) {
         const habits = await fetchHabits();
         setHabits(habits);
 
-        const dates = get14DayWindow();
+        const dates = getWindow();
         const entries = await getInitialEntries(habits, dates);
         setEntries(entries);
         console.log("Entries:",entries);
