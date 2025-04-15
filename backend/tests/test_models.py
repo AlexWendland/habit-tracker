@@ -1,6 +1,6 @@
 import pytest
-from pydantic import ValidationError
-from habit_tracker.columns.models import ColumnDetails, ColumnType, HabitValue  # replace with actual import
+
+from habit_tracker.models import ColumnDetails, ColumnType, HabitValue
 
 
 @pytest.mark.parametrize(

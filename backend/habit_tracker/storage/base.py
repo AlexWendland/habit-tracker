@@ -1,7 +1,8 @@
 import abc
 import datetime
+from math import isnan
 
-from habit_tracker.columns.models import ColumnDetails, ColumnType, HabitValue
+from habit_tracker.models import ColumnDetails, ColumnType, HabitValue
 
 
 class StorageBase(abc.ABC):
@@ -11,7 +12,7 @@ class StorageBase(abc.ABC):
 
     habit_dictionary: dict[str, ColumnDetails]
 
-    def get_habit_value_by_day(self, habit_key: str, day: datetime.date) -> HabitValue:
+    def get_habit_value_by_day(self, habit_key: str, day: datetime.date) -> HabitValue | None:
         """
         Get the value of a habit for a specific day.
         """
@@ -20,7 +21,20 @@ class StorageBase(abc.ABC):
         value = self._get_single_value_by_day(habit_key, day)
         if not self.habit_dictionary[habit_key].check_value_type_matches(value):
             raise ValueError(f"Value type mismatch for habit key: {habit_key}")
-        return value
+        # Handle NaN values for number types
+        return None if isnan(value) else value
+
+    def get_habit_values_between(self, habit_key: str, start_day: datetime.date, end_day: datetime.date) -> dict[datetime.date, HabitValue | None]:
+        if habit_key not in self.habit_dictionary:
+            raise ValueError(f"Invalid habit key: {habit_key}")
+        if start_day > end_day:
+            raise ValueError(f"Start date {start_day} cannot be after end date {end_day}")
+        values = self._get_habit_values_between(habit_key, start_day, end_day)
+        for date, value in values.items():
+            if not self.habit_dictionary[habit_key].check_value_type_matches(value):
+                raise ValueError(f"Value on day {date} type mismatch for habit key: {habit_key}")
+        # Handle NaN values for number types
+        return {date: (None if isnan(value) else value) for date, value in values.items()}
 
     def set_habit_value_by_day(self, habit_key: str, day: datetime.date, value: HabitValue) -> None:
         """
@@ -57,6 +71,14 @@ class StorageBase(abc.ABC):
             return False
         else:
             raise ValueError(f"Unknown column type: {column_type}")
+
+
+    @abc.abstractmethod
+    def _get_habit_values_between(self, habit_key: str, start_date: datetime.date, end_date: datetime.date) -> dict[datetime.date, HabitValue | None]:
+        """
+        Gets the values of a habit between two dates (inclusive).
+        """
+        ...
 
     @abc.abstractmethod
     def _get_single_value_by_day(self, habit_key: str, day: datetime.date) -> HabitValue:

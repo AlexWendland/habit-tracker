@@ -2,7 +2,7 @@ import functools
 
 import yaml
 
-from habit_tracker.columns.models import ColumnDetails
+from habit_tracker.models import ColumnDetails
 
 
 @functools.lru_cache(maxsize=1)

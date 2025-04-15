@@ -1,8 +1,10 @@
 import datetime
-from typing_extensions import override
-from habit_tracker.columns.models import ColumnDetails, ColumnType, HabitValue
-from habit_tracker.storage.base import StorageBase
 import random
+from typing import override
+
+from habit_tracker.models import ColumnDetails, ColumnType, HabitValue
+from habit_tracker.storage.base import StorageBase
+
 
 class LocalStorage(StorageBase):
 
@@ -18,6 +20,17 @@ class LocalStorage(StorageBase):
     def _set_single_value_by_day(self, habit_key: str, day: datetime.date, value: HabitValue) -> None:
         self._local_storage.setdefault(habit_key, {})[day] = value
 
+    @override
+    def _get_habit_values_between(self, habit_key: str, start_date: datetime.date, end_date: datetime.date) -> dict[datetime.date, HabitValue]:
+        """
+        Gets the values of a habit between two dates (inclusive).
+        """
+        values = {}
+        current_date = start_date
+        while current_date <= end_date:
+            values[current_date] = self._get_single_value_by_day(habit_key, current_date)
+            current_date += datetime.timedelta(days=1)
+        return values
 
 def get_mock_local_storage() -> LocalStorage:
     """

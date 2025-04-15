@@ -38,3 +38,6 @@ class ColumnDetails(pydantic.BaseModel):
             return isinstance(value, bool)
         else:
             raise ValueError(f"Unknown column type: {self.column_type}")
+
+class HabitReturnValue(pydantic.BaseModel):
+    value: HabitValue | None

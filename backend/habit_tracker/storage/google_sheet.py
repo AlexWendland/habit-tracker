@@ -1,9 +1,9 @@
 import datetime
-from typing_extensions import override
+from typing import override
 
 import gspread
 
-from habit_tracker.columns.models import ColumnDetails, ColumnType, HabitValue
+from habit_tracker.models import ColumnDetails, ColumnType, HabitValue
 from habit_tracker.storage.base import StorageBase
 
 CREDENTIAL_FILE = "drive-credentials.json"
@@ -26,27 +26,48 @@ class GoogleSheetStorage(StorageBase):
         returns None.
         """
         cell_value: str | None = self._worksheet.get(self._get_cell(habit_key, day)).first()
-        column_type = self._get_column_type(habit_key)
-        if column_type == ColumnType.NUMBER:
-            return self._get_default_value(habit_key) if cell_value is None else float(cell_value)
-        elif column_type == ColumnType.BOOLEAN:
-            return self._get_default_value(habit_key) if cell_value is None else cell_value.first().lower() == "true"
-        else:
-            raise ValueError(f"Unknown column type: {column_details.column_type}")
+        return self._parse_cell_value(cell_value, habit_key)
 
     @override
     def _set_single_value_by_day(self, habit_key: str, day: datetime.date, value: HabitValue) -> None:
         """
         Set the value of a habit for a specific day.
         """
-        cell = self._worksheet.get(self._get_cell(habit_key, day))
+        cell = self._get_cell(habit_key, day)
         column_type = self._get_column_type(habit_key)
         if column_type == ColumnType.NUMBER:
             self._worksheet.update_acell(cell, float(value))
         elif column_type == ColumnType.BOOLEAN:
-            self._worksheet.update_acell(cell, "TRUE" if value else "")
+            self._worksheet.update_acell(cell, "TRUE" if value else "FALSE")
         else:
             raise ValueError(f"Unknown column type: {column_type}")
+
+    @override
+    def _get_habit_values_between(self, habit_key: str, start_date: datetime.date, end_date: datetime.date) -> dict[datetime.date, HabitValue | None]:
+        start_cell = self._get_cell(habit_key, start_date)
+        end_cell = self._get_cell(habit_key, end_date)
+
+        # Use .range() to get actual Cell objects, including empties
+        cell_range = self._worksheet.range(f"{start_cell}:{end_cell}")
+
+        result: dict[datetime.date, HabitValue | None] = {}
+        current_date = start_date
+        for cell in cell_range:
+            value = cell.value if cell.value != "" else None
+            result[current_date] = self._parse_cell_value(value, habit_key)
+            current_date += datetime.timedelta(days=1)
+    
+        return result
+
+    def _parse_cell_value(self, value:str | None, habit_key: str) -> HabitValue | None:
+        column_type = self._get_column_type(habit_key)
+        if column_type == ColumnType.NUMBER:
+            return self._get_default_value(habit_key) if value is None else float(value)
+        elif column_type == ColumnType.BOOLEAN:
+            return self._get_default_value(habit_key) if value is None else value.lower() == "true"
+        else:
+            raise ValueError(f"Unknown column type: {column_details.column_type}")
+
 
     def _get_cell(self, column_name: str, date: datetime.date) -> str:
         """

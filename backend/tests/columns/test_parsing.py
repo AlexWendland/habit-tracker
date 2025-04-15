@@ -1,5 +1,5 @@
 from habit_tracker.columns.parsing import get_column_details
-from habit_tracker.columns.models import ColumnDetails, ColumnType
+from habit_tracker.models import ColumnDetails, ColumnType
 from habit_tracker.constants import COLUMN_FILE
 
 MOCK_FILE = "tests/columns/mock_columns.yaml"

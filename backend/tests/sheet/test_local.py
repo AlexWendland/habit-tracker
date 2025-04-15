@@ -2,7 +2,7 @@ import datetime
 import pytest
 from math import isnan
 
-from habit_tracker.columns.models import ColumnDetails, ColumnType, HabitValue
+from habit_tracker.models import ColumnDetails, ColumnType, HabitValue
 from habit_tracker.storage.local import LocalStorage
 
 MOCK_DATE = datetime.date(2023, 10, 1)
@@ -39,7 +39,7 @@ def is_equal_with_nan_check(value1: HabitValue, value2: HabitValue) -> bool:
     [
         ("water", MOCK_DATE, 2.5),
         ("exercise", MOCK_DATE, True),
-        ("water", datetime.date(2023, 10, 2), float("nan")),
+        ("water", datetime.date(2023, 10, 2), None),
         ("exercise", datetime.date(2023, 10, 2), False),
     ]
 )
@@ -106,3 +106,13 @@ def test_get_column_type(mock_storage:LocalStorage):
     )
 def test_get_default_value(column: str, expected_value: HabitValue, mock_storage: LocalStorage):
     assert is_equal_with_nan_check(mock_storage._get_default_value(column), expected_value)
+
+@pytest.mark.parametrize(
+    "habit_value, expected",
+    [
+        ("water", {MOCK_DATE: 2.5, MOCK_DATE+datetime.timedelta(days=1): None}),
+        ("exercise", {MOCK_DATE: True, MOCK_DATE + datetime.timedelta(days=1): False})
+    ]
+)
+def test_get_habit_values_between(mock_storage: LocalStorage, habit_value: str, expected: dict[datetime.date, HabitValue | None]):
+    assert mock_storage.get_habit_values_between(habit_value, MOCK_DATE, datetime.date(2023, 10, 2)) == expected

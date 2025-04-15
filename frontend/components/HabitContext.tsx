@@ -9,7 +9,7 @@ import {
   ReactNode,
 } from "react";
 import { Habit, Entries } from "@/types/habit";
-import { fetchHabits, fetchHabitEntry, setHabitEntry } from "@/lib/habitsApi";
+import { fetchHabits, fetchHabitEntryBetween, setHabitEntry } from "@/lib/habitsApi";
 import { get14DayWindow } from "@/lib/dateUtils";
 
 type HabitContextType = {
@@ -34,15 +34,11 @@ export const useHabitContext = () => {
 
 async function getInitialEntries(habits: Habit[], dates: string[]): Promise<Entries> {
   const result: Entries = {};
+  const start_date = dates[0];
+  const end_date = dates[dates.length - 1];
   await Promise.all(
     habits.map(async (habit) => {
-      result[habit.key] = {};
-      await Promise.all(
-        dates.map(async (date) => {
-          const value = await fetchHabitEntry(habit.key, date);
-          result[habit.key][date] = value;
-        })
-      );
+      result[habit.key] = await fetchHabitEntryBetween(habit.key, start_date, end_date)
     })
   );
   return result;
